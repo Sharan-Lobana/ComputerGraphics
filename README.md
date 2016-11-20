@@ -12,9 +12,9 @@ To install the dependencies related to OpenGL refer to the
 3. *Run* <code> g++ windmill.cpp -lglut -lGL -lGLU -o windmill </code> 
 4. *Run* <code> ./windmill </code>
 
-A new window will open up.
-USE **UP_ARROW_KEY** to increase the speed of the wind in one direction
-USE **DOWN_ARROW_KEY** to decrease the speed or reverse the direction of wind
-USE **LEFT_ARROW_KEY** and **RIGHT_ARROW_KEY** to rotate the view about vertical axis.
+A new window will open up.</br>
+USE **UP_ARROW_KEY** to increase the speed of the wind in one direction.</br>
+USE **DOWN_ARROW_KEY** to decrease the speed or reverse the direction of wind.</br>
+USE **LEFT_ARROW_KEY** and **RIGHT_ARROW_KEY** to rotate the view about vertical axis.</br>
 ### Windows
 *To be added later*
