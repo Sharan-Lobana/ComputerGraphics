@@ -6,19 +6,25 @@
 #define GL_GLEXT_PROTOTYPES
 
 double scale = 1.0;
-double rx = 0, ry = 0, rz = 0, z_step = 1.0, r_step = 5.0;
-
-void Cone(double radius, double height, double c1, double c2)
+double rx = 0, ry = 0, rz = 0, z_step = 0.0, r_step = 5.0;
+double progoffset = 0.0, progstep = 0.000;
+void Cone(double radius, double height, double c1, double c2,bool flag = true)
 {
 	int steps = 1000;
 	for(int i=0;i<steps;++i)
 	{
 		double th = (360.0/steps)*i;
 		glBegin (GL_LINES);
+			if(flag)
 	    glColor3f  (c1,c1,c1);
-	    glVertex3f  (radius*cos(th),radius*sin(th) , 0);
-	    glColor3f  (c2, c2, c2);
-	    glVertex3f(0,0,height);
+			else
+			glColor3f(c1,0,0);
+			glVertex3f  (radius*cos(th),radius*sin(th) , 0);
+			if(flag)
+			glColor3f  (c2, c2, c2);
+			else
+			glColor3f(c2,0,0);
+			glVertex3f(0,0,height);
 	    glEnd ();
 	}
 }
@@ -32,6 +38,48 @@ void Wing(double radius, double height, double epoch)
 	glRotatef(90, 0.0, 1.0, 0.0);
 	Cone(radius,height,.1,1);
 }
+
+//Arrow is from pos1 to pos2 with propagation offset of progoffset
+//pos2 > pos1
+//Initialize pos1 to -1.0 and pos2 to pos1 + length of the arrow
+void Arrow(double radius,double x, double y, double pos1, double pos2, double c1, double c2)
+{
+	glLoadIdentity();
+	glRotatef(ry,0,1.0,0);
+	if(progstep < 0)
+	{
+		double temp = c1;
+		c1 = c2;
+		c2 = temp;
+	}
+	else if(progstep == 0.0)
+	{
+		c1 = c2 = 0.0;
+	}
+	for(int i = 0; i < 100; i++)
+	{
+		double th = (360.0/100)*i;
+		glBegin(GL_LINES);
+			glColor3f(c1,0,0);
+			glVertex3f(x+radius*cos(th),y+radius*sin(th),pos1+progoffset);
+			glColor3f(c2,0,0);
+			glVertex3f(x+radius*cos(th),y+radius*sin(th),pos2+progoffset);
+		glEnd();
+	}
+	if(progstep > 0)
+	{
+		glTranslatef(x,y,pos2+progoffset);
+		Cone(3*radius,fabs(pos2-pos1)*0.4,1.0,1.0,false);
+	}
+	else if(progstep < 0)
+	{
+		glTranslatef(x,y,pos1+progoffset);
+		glRotatef(180,0,1.0,0);
+		Cone(3*radius,fabs(pos2-pos1)*0.4,1.0,1.0,false);
+	}
+
+
+}
 void drawCube()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear color and depth buffers
@@ -44,7 +92,7 @@ void drawCube()
 	glRotatef(ry, 0.0, 1.0, 0.0);
 	glRotatef(90, 1.0, 0.0, 0.0);
 	GLUquadricObj *quadObj = gluNewQuadric();
-	gluCylinder(quadObj, .03, .05, 1.0, 100, 100);
+	gluCylinder(quadObj, .03, .05, 0.75, 100, 100);
 
 	glLoadIdentity();
 	glRotatef(ry, 0.0, 1.0, 0.0);
@@ -62,6 +110,24 @@ void drawCube()
 	Wing(.04,.5,180);
 	Wing(.04,.5,270);
 
+	Arrow(0.005,0.2,0.2,-.98,-0.78,0.2,1.0);
+	Arrow(0.005,0.2,-0.2,-.98,-0.78,0.2,1.0);
+	Arrow(0.005,-0.2,0.2,-.98,-0.78,0.2,1.0);
+	Arrow(0.005,-0.2,-0.2,-.98,-0.78,0.2,1.0);
+
+	glLoadIdentity();
+	glRotatef(-10, 1.0, 0.0, 0.0);
+	glRotatef(ry+45, 0.0, 1.0, 0.0);
+	for(int i=0;i<1000;++i)
+	{
+		glBegin (GL_LINES);
+	    glColor3f  (0,.1+.3*i/1000.0,0);
+	    glVertex3f  (-.5+i/1000.0,-.75, .5);
+	    glColor3f  (0,.7+.3*i/1000.0,0);
+	    glVertex3f  (-.5+i/1000.0,-.75, -.5);
+	    glEnd();
+	}
+
 	glFlush();
     glutSwapBuffers();
 }
@@ -73,9 +139,15 @@ void specialKeys(int key, int x, int y)
 	if ( key == GLUT_KEY_LEFT )
 		ry -= r_step;
 	if ( key == GLUT_KEY_UP )
+	{
 		z_step += .05;
+		progstep += 0.0005;
+	}
 	if ( key == GLUT_KEY_DOWN )
+	{
 		z_step -= .05;
+		progstep -= 0.0005;
+	}
 	// if ( key == GLUT_KEY_PAGE_UP )
 	// 	rz += r_step;
 	// if ( key == GLUT_KEY_PAGE_DOWN )
@@ -86,6 +158,11 @@ void specialKeys(int key, int x, int y)
 void rotate()
 {
 	rz += z_step;
+	progoffset += progstep;
+	if(-0.78 + progoffset > 0.99)
+		progoffset = 0.0;
+	else if(-.98 + progoffset < -0.99)
+		progoffset = 1.76;
 	glutPostRedisplay();
 }
 
