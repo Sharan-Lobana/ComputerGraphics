@@ -4,9 +4,10 @@
 #include <GL/glut.h>
 
 #define GL_GLEXT_PROTOTYPES
-
+#define PI 3.1416
 double scale = 1.0;
-double rx = 0, ry = 0, rz = 0, z_step = 0.0, r_step = 5.0;
+double world_y = 0, wing_z = 0, z_factor = 100.0, r_step = 5.0;
+double wind_y = 0, wind_x = 0;
 double progoffset = 0.0, progstep = 0.000;
 void Cone(double radius, double height, double c1, double c2,bool flag = true)
 {
@@ -31,9 +32,9 @@ void Cone(double radius, double height, double c1, double c2,bool flag = true)
 void Wing(double radius, double height, double epoch)
 {
 	glLoadIdentity();
-	glRotatef(ry, 0.0, 1.0, 0.0);
+	glRotatef(world_y, 0.0, 1.0, 0.0);
 	glTranslatef(.0,-.05,0);
-	glRotatef(rz+epoch, 0.0, 0.0, 1.0);
+	glRotatef(wing_z+epoch, 0.0, 0.0, 1.0);
 	glTranslatef(.05,.0,-.07);
 	glRotatef(90, 0.0, 1.0, 0.0);
 	Cone(radius,height,.1,1);
@@ -45,7 +46,10 @@ void Wing(double radius, double height, double epoch)
 void Arrow(double radius,double x, double y, double pos1, double pos2, double c1, double c2)
 {
 	glLoadIdentity();
-	glRotatef(ry,0,1.0,0);
+	glRotatef(world_y,0,1.0,0);
+	glRotatef(wind_x,1.0,0,0);
+	glRotatef(wind_y,0,1.0,0);
+	
 	if(progstep < 0)
 	{
 		double temp = c1;
@@ -86,21 +90,21 @@ void drawCube()
 
 	glLoadIdentity();	// Reset the model-view matrix
 
-	// rotate the cube according to rx ry and rz parameters , controlled via arrow keys
+	// rotate the cube according to rx world_y and wing_z parameters , controlled via arrow keys
 
 	glColor3f  (.3, .3, .3);
-	glRotatef(ry, 0.0, 1.0, 0.0);
+	glRotatef(world_y, 0.0, 1.0, 0.0);
 	glRotatef(90, 1.0, 0.0, 0.0);
 	GLUquadricObj *quadObj = gluNewQuadric();
 	gluCylinder(quadObj, .03, .05, 0.75, 100, 100);
 
 	glLoadIdentity();
-	glRotatef(ry, 0.0, 1.0, 0.0);
+	glRotatef(world_y, 0.0, 1.0, 0.0);
 	glTranslatef(0,-0.05,-.10);
 	gluCylinder(quadObj, .05, .05, .07, 100, 100);
 
 	glLoadIdentity();
-	glRotatef(ry, 0.0, 1.0, 0.0);
+	glRotatef(world_y, 0.0, 1.0, 0.0);
 	glTranslatef(0,-0.05,-.1);
 	glRotatef(180, 0.0, 1.0, 0.0);
 	Cone(.05,.0,.3,.3);
@@ -117,7 +121,7 @@ void drawCube()
 
 	glLoadIdentity();
 	glRotatef(-10, 1.0, 0.0, 0.0);
-	glRotatef(ry+45, 0.0, 1.0, 0.0);
+	glRotatef(world_y+45, 0.0, 1.0, 0.0);
 	for(int i=0;i<1000;++i)
 	{
 		glBegin (GL_LINES);
@@ -135,29 +139,29 @@ void drawCube()
 void specialKeys(int key, int x, int y)
 {
 	if ( key == GLUT_KEY_RIGHT )
-		ry += r_step;
+		world_y += r_step;
 	if ( key == GLUT_KEY_LEFT )
-		ry -= r_step;
+		world_y -= r_step;
 	if ( key == GLUT_KEY_UP )
 	{
-		z_step += .05;
+		//z_step += .05;
 		progstep += 0.0005;
 	}
 	if ( key == GLUT_KEY_DOWN )
 	{
-		z_step -= .05;
+		//z_step -= .05;
 		progstep -= 0.0005;
 	}
 	// if ( key == GLUT_KEY_PAGE_UP )
-	// 	rz += r_step;
+	// 	wing_z += r_step;
 	// if ( key == GLUT_KEY_PAGE_DOWN )
-	// 	rz -= r_step;
+	// 	wing_z -= r_step;
 
 	glutPostRedisplay();
 }
 void rotate()
 {
-	rz += z_step;
+	wing_z += progstep*z_factor*cos(wind_x/180*PI)*cos(wind_y/180*PI);
 	progoffset += progstep;
 	if(-0.78 + progoffset > 0.99)
 		progoffset = 0.0;
@@ -165,7 +169,17 @@ void rotate()
 		progoffset = 1.76;
 	glutPostRedisplay();
 }
-
+void rotateWind(unsigned char key, int x, int y)
+{
+	if(key == 'w')
+		wind_x += r_step;
+	else if(key == 's')
+		wind_x -= r_step;
+	else if(key == 'a')
+		wind_y += r_step;
+	else if(key == 'd')
+		wind_y -= r_step;
+}
 int main(int argc, char* argv[])
 {
 	// Initialize GLUT and process user parameters
@@ -184,6 +198,6 @@ int main(int argc, char* argv[])
 	glutDisplayFunc(drawCube);
 	glutIdleFunc(rotate);
 	glutSpecialFunc(specialKeys);
-
+	glutKeyboardFunc(rotateWind);
 	glutMainLoop();
 }
