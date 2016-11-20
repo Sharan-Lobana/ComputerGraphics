@@ -1,3 +1,20 @@
 # ComputerGraphics
 
-Introductory 3D objects in openGL and related computer graphics packages.
+Windmill modelling in OpenGL and C++.
+
+## Dependencies
+To install the dependencies related to OpenGL refer to the 
+<a href="http://www.prinmath.com/csci5229/misc/install.html">**link**</a> 
+## Steps to execute the program
+### Linux
+1. Open **Terminal** or any terminal emulator(**Terminator** etc)
+2. *Change* the directory to location of **windmill.cpp**
+3. *Run* <code> g++ windmill.cpp -lglut -lGL -lGLU -o windmill </code> 
+4. *Run* <code> ./windmill </code>
+
+A new window will open up.
+USE **UP_ARROW_KEY** to increase the speed of the wind in one direction
+USE **DOWN_ARROW_KEY** to decrease the speed or reverse the direction of wind
+USE **LEFT_ARROW_KEY** and **RIGHT_ARROW_KEY** to rotate the view about vertical axis.
+### Windows
+*To be added later*
