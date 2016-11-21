@@ -6,8 +6,7 @@
 #define GL_GLEXT_PROTOTYPES
 #define PI 3.1416
 #define SHARPNESS_FACTOR 500
-double scale = 1.0;
-double world_y = 0, wing_z = 0, z_factor = 100.0, r_step = 5.0;
+double world_y = 0, wing_z = 0, z_factor = 100.0, r_step = 5.0, scale = 1.0, world_y_trans = 0.0;
 double wind_y = 0, wind_x = 0;
 double progoffset = 0.0, progstep = 0.000;
 
@@ -89,6 +88,9 @@ void ThreeDtriangle(double base_length, double height, double y_span, double c1,
 void Wing(double radius, double height, double epoch)
 {
 	glLoadIdentity();
+glTranslatef(0.0,world_y_trans,0.0);
+
+ glScalef(scale,scale,scale);
 	glRotatef(world_y, 0.0, 1.0, 0.0);
 	glTranslatef(.0,-.05,0);
 	glRotatef(wing_z+epoch, 0.0, 0.0, 1.0);
@@ -103,6 +105,8 @@ void Wing(double radius, double height, double epoch)
 void Arrow(double radius,double x, double y, double pos1, double pos2, double c1, double c2)
 {
 	glLoadIdentity();
+glTranslatef(0.0,world_y_trans,0.0);
+ glScalef(scale,scale,scale);
 	glRotatef(world_y,0,1.0,0);
 	glRotatef(wind_x,1.0,0,0);
 	glRotatef(wind_y,0,1.0,0);
@@ -146,6 +150,8 @@ void Arrow(double radius,double x, double y, double pos1, double pos2, double c1
 void TriangularWing(double base_length, double small_height,double large_height, double y_span, double epoch)
 {
 	glLoadIdentity();
+glTranslatef(0.0,world_y_trans,0.0);
+ glScalef(scale,scale,scale);
 	glRotatef(world_y,0.0,1.0,0.0);
   glTranslatef(.0,-0.03,-0.065);
 	glRotatef(-wing_z+epoch,0.0,0.0,1.0);
@@ -155,6 +161,8 @@ void TriangularWing(double base_length, double small_height,double large_height,
 	ThreeDtriangle(base_length, small_height, y_span, 1.0, 0.6);
 
 	glLoadIdentity();
+glTranslatef(0.0,world_y_trans,0.0);
+ glScalef(scale,scale,scale);
 	glRotatef(world_y,0.0,1.0,0.0);
 	glTranslatef(.0,-0.03,-0.065);
 	glRotatef(-wing_z+epoch,0.0,0.0,1.0);
@@ -184,7 +192,9 @@ void drawWindMill()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear color and depth buffers
 
-	glLoadIdentity();	// Reset the model-view matrix
+	glLoadIdentity();
+glTranslatef(0.0,world_y_trans,0.0);
+ glScalef(scale,scale,scale);	// Reset the model-view matrix
 
 	// rotate the cube according to rx world_y and wing_z parameters , controlled via arrow keys
 	glRotatef(world_y+90, 0.0, 1.0, 0.0);
@@ -194,16 +204,22 @@ void drawWindMill()
 	GLUquadricObj *quadObj = gluNewQuadric();
 
 	glLoadIdentity();
+glTranslatef(0.0,world_y_trans,0.0);
+  glScalef(scale,scale,scale);
 	glRotatef(world_y, 0.0, 1.0, 0.0);
 	glTranslatef(0,-0.03,-.07);
 	gluCylinder(quadObj, .03, .03, .05, 100, 100);
 
 	glLoadIdentity();
+glTranslatef(0.0,world_y_trans,0.0);
+ glScalef(scale,scale,scale);
 	glRotatef(world_y, 0.0, 1.0, 0.0);
 	glTranslatef(0,-0.03,-.07);
 	Cone(.03,.0,.6,.6);
 
 	glLoadIdentity();
+glTranslatef(0.0,world_y_trans,0.0);
+ glScalef(scale,scale,scale);
 	glRotatef(world_y, 0.0, 1.0, 0.0);
 	glTranslatef(0,-0.03,-0.02);
 	Cone(.03,.0,.6,.6);
@@ -224,6 +240,8 @@ void drawWindMill()
 	// TriangularWing(0.055,0.05,0.4,0.025,270);
 
 	glLoadIdentity();
+glTranslatef(0.0,world_y_trans,0.0);
+ glScalef(scale,scale,scale);
 	glRotatef(-10, 1.0, 0.0, 0.0);
 	glRotatef(world_y+45, 0.0, 1.0, 0.0);
 	for(int i=0;i<1000;++i)
@@ -256,10 +274,16 @@ void specialKeys(int key, int x, int y)
 		//z_step -= .05;
 		progstep -= 0.0005;
 	}
-	// if ( key == GLUT_KEY_PAGE_UP )
-	// 	wing_z += r_step;
-	// if ( key == GLUT_KEY_PAGE_DOWN )
-	// 	wing_z -= r_step;
+	if ( key == GLUT_KEY_PAGE_DOWN )
+	{
+		if(world_y_trans < scale - 1)
+			world_y_trans += 0.05;
+	}
+	if ( key == GLUT_KEY_PAGE_UP )
+	{
+		if(world_y_trans > -scale + 1)
+		world_y_trans -= 0.05;
+	}
 
 	glutPostRedisplay();
 }
@@ -284,6 +308,23 @@ void rotateWind(unsigned char key, int x, int y)
 	else if(key == 'd')
 		wind_y -= r_step;
 }
+void mouseWheel(int button, int dir, int x, int y)
+{
+    if (button == 3)
+    {
+			if(scale <= 3.0)
+			scale += 0.03;
+        // Zoom in
+    }
+    else if(button == 4)
+    {
+			if(scale >= 0.5)
+			scale -= 0.03;
+        // Zoom out
+    }
+
+    return;
+}
 int main(int argc, char* argv[])
 {
 	// Initialize GLUT and process user parameters
@@ -303,5 +344,6 @@ int main(int argc, char* argv[])
 	glutIdleFunc(rotate);
 	glutSpecialFunc(specialKeys);
 	glutKeyboardFunc(rotateWind);
+	glutMouseFunc(mouseWheel);
 	glutMainLoop();
 }
