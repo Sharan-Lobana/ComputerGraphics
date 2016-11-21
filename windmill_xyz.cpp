@@ -6,9 +6,9 @@
 #define GL_GLEXT_PROTOTYPES
 #define PI 3.1416
 #define SHARPNESS_FACTOR 500
-double world_y = 0, wing_z = 0, z_factor = 100.0, r_step = 5.0, scale = 1.0, world_y_trans = 0.0;
-double wind_y = 0, wind_x = 0;
-double progoffset = 0.0, progstep = 0.000;
+double world_y = 0, wing_z = 0, z_factor = 100.0, r_step = 5.0, scale = 1.0, world_y_trans = 0.0 , wing_speed = 0.0;
+double wind_y = 0, wind_x = 0, wind_acc_factor = .8, turbine_factor = 0.005;
+double progoffset = 0.0, progstep = 0.000, progstep_acc = .0005;
 
 void Cone(double radius, double height, double c1, double c2,bool flag = true)
 {
@@ -267,12 +267,12 @@ void specialKeys(int key, int x, int y)
 	if ( key == GLUT_KEY_UP )
 	{
 		//z_step += .05;
-		progstep += 0.0005;
+		progstep += progstep_acc;
 	}
 	if ( key == GLUT_KEY_DOWN )
 	{
 		//z_step -= .05;
-		progstep -= 0.0005;
+		progstep -= progstep_acc;
 	}
 	if ( key == GLUT_KEY_PAGE_DOWN )
 	{
@@ -289,7 +289,14 @@ void specialKeys(int key, int x, int y)
 }
 void rotate()
 {
-	wing_z += progstep*z_factor*cos(wind_x/180*PI)*cos(wind_y/180*PI);
+	double acc = progstep * cos(wind_x/180*PI)*cos(wind_y/180*PI) * wind_acc_factor - wing_speed * turbine_factor;
+
+	wing_speed += acc;
+
+	// wing_z += progstep*z_factor*cos(wind_x/180*PI)*cos(wind_y/180*PI);
+
+	wing_z += wing_speed;
+
 	progoffset += progstep;
 	if(-0.78 + progoffset > 0.99)
 		progoffset = 0.0;
