@@ -10,6 +10,7 @@ double scale = 1.0;
 double world_y = 0, wing_z = 0, z_factor = 100.0, r_step = 5.0;
 double wind_y = 0, wind_x = 0;
 double progoffset = 0.0, progstep = 0.000;
+
 void Cone(double radius, double height, double c1, double c2,bool flag = true)
 {
 	int steps = 1000;
@@ -57,7 +58,7 @@ void ThreeDtriangle(double base_length, double height, double y_span, double c1,
 	for(int i = 0; i <= SHARPNESS_FACTOR; i++)
 	{
 		glBegin(GL_LINES);
-			glColor3f(c1,c1,c1);
+			glColor3f(c2,c2,c2);
 			glVertex3f(-1*base_length/2,(double)i*y_span/SHARPNESS_FACTOR,0.0);
 			glColor3f(c2,c2,c2);
 			glVertex3f(0.0,(double)i*y_span/SHARPNESS_FACTOR,height);
@@ -67,7 +68,7 @@ void ThreeDtriangle(double base_length, double height, double y_span, double c1,
 	for(int i = 0; i <= SHARPNESS_FACTOR; i++)
 	{
 		glBegin(GL_LINES);
-			glColor3f(c1,c1,c1);
+			glColor3f(c2,c2,c2);
 			glVertex3f(base_length/2,(double)i*y_span/SHARPNESS_FACTOR,0.0);
 			glColor3f(c2,c2,c2);
 			glVertex3f(0.0,(double)i*y_span/SHARPNESS_FACTOR,height);
@@ -84,6 +85,7 @@ void ThreeDtriangle(double base_length, double height, double y_span, double c1,
 		glEnd();
 	}
 }
+
 void Wing(double radius, double height, double epoch)
 {
 	glLoadIdentity();
@@ -111,10 +113,10 @@ void Arrow(double radius,double x, double y, double pos1, double pos2, double c1
 		c1 = c2;
 		c2 = temp;
 	}
-	else if(progstep == 0.0)
-	{
-		c1 = c2 = 0.0;
-	}
+
+	if(fabs(progstep) < .00001)
+		return;
+
 	for(int i = 0; i < 100; i++)
 	{
 		double th = (360.0/100)*i;
@@ -125,6 +127,9 @@ void Arrow(double radius,double x, double y, double pos1, double pos2, double c1
 			glVertex3f(x+radius*cos(th),y+radius*sin(th),pos2+progoffset);
 		glEnd();
 	}
+
+
+
 	if(progstep > 0)
 	{
 		glTranslatef(x,y,pos2+progoffset);
@@ -141,48 +146,67 @@ void Arrow(double radius,double x, double y, double pos1, double pos2, double c1
 void TriangularWing(double base_length, double small_height,double large_height, double y_span, double epoch)
 {
 	glLoadIdentity();
-
 	glRotatef(world_y,0.0,1.0,0.0);
-	glRotatef(wing_z+epoch,0.0,0.0,1.0);
-	// glTranslatef(.0,-0.05,-1.0);
-	glRotatef(30,1.0,0.0,0.0);
-	glTranslatef(-2.0*small_height,0.0,0.0);
+  glTranslatef(.0,-0.03,-0.065);
+	glRotatef(-wing_z+epoch,0.0,0.0,1.0);
+	glRotatef(60,1.0,0.0,0.0);
+	glTranslatef(-1.4*small_height,0.0,0.0);
 	glRotatef(90,0.0,1.0,0.0);
 	ThreeDtriangle(base_length, small_height, y_span, 1.0, 0.6);
 
 	glLoadIdentity();
 	glRotatef(world_y,0.0,1.0,0.0);
-	glRotatef(wing_z+epoch,0.0,0.0,1.0);
-	// glTranslatef(.0,-0.05,-1.0);
-	glRotatef(30,1.0,0.0,0.0);
-	glTranslatef(-2.0*small_height,0.0,0.0);
+	glTranslatef(.0,-0.03,-0.065);
+	glRotatef(-wing_z+epoch,0.0,0.0,1.0);
+	glRotatef(60,1.0,0.0,0.0);
+	glTranslatef(-1.4*small_height,0.0,0.0);
 	glRotatef(270,0.0,1.0,0.0);
 	ThreeDtriangle(base_length, large_height, y_span, 1.0, 0.6);
 }
-void drawCube()
+
+void Shaft(double r_bottom, double r_top, double height)
+{
+	int steps = 1000;
+	for(int i=0;i<steps;++i)
+	{
+		double th = (2*PI/steps)*i;
+			glBegin (GL_LINES);
+			double c = .7 + cos(th)*.2;
+			glColor3f  (c , c, c);
+			glVertex3f  (r_top*cos(th),r_top*sin(th) , 0);
+			glVertex3f  (r_bottom*cos(th),r_bottom*sin(th) , height);
+			glEnd ();
+	}
+
+}
+
+void drawWindMill()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear color and depth buffers
 
 	glLoadIdentity();	// Reset the model-view matrix
 
 	// rotate the cube according to rx world_y and wing_z parameters , controlled via arrow keys
-
-	glColor3f  (.3, .3, .3);
-	glRotatef(world_y, 0.0, 1.0, 0.0);
+	glRotatef(world_y+90, 0.0, 1.0, 0.0);
 	glRotatef(90, 1.0, 0.0, 0.0);
+	// gluCylinder(quadObj, .03, .05, 0.75, 100, 100);
+	Shaft(.03,.02,.75);
 	GLUquadricObj *quadObj = gluNewQuadric();
-	gluCylinder(quadObj, .03, .05, 0.75, 100, 100);
 
 	glLoadIdentity();
 	glRotatef(world_y, 0.0, 1.0, 0.0);
-	glTranslatef(0,-0.05,-.10);
-	gluCylinder(quadObj, .05, .05, .07, 100, 100);
+	glTranslatef(0,-0.03,-.07);
+	gluCylinder(quadObj, .03, .03, .05, 100, 100);
 
 	glLoadIdentity();
 	glRotatef(world_y, 0.0, 1.0, 0.0);
-	glTranslatef(0,-0.05,-.1);
-	glRotatef(180, 0.0, 1.0, 0.0);
-	Cone(.05,.0,.3,.3);
+	glTranslatef(0,-0.03,-.07);
+	Cone(.03,.0,.6,.6);
+
+	glLoadIdentity();
+	glRotatef(world_y, 0.0, 1.0, 0.0);
+	glTranslatef(0,-0.03,-0.02);
+	Cone(.03,.0,.6,.6);
 
 	// Wing(.04,.5,0);
 	// Wing(.04,.5,90);
@@ -194,10 +218,10 @@ void drawCube()
 	Arrow(0.005,-0.2,0.2,-.98,-0.78,0.2,1.0);
 	Arrow(0.005,-0.2,-0.2,-.98,-0.78,0.2,1.0);
 
-	TriangularWing(0.04,0.05,0.4,0.03,0);
-	TriangularWing(0.04,0.05,0.4,0.03,90);
-	TriangularWing(0.04,0.05,0.4,0.03,180);
-	TriangularWing(0.04,0.05,0.4,0.03,270);
+	TriangularWing(0.055,0.05,0.4,0.025,30);
+	TriangularWing(0.055,0.05,0.4,0.025,150);
+	TriangularWing(0.055,0.05,0.4,0.025,270);
+	// TriangularWing(0.055,0.05,0.4,0.025,270);
 
 	glLoadIdentity();
 	glRotatef(-10, 1.0, 0.0, 0.0);
@@ -271,11 +295,11 @@ int main(int argc, char* argv[])
 	// Set Window Position
 	glutInitWindowPosition(100,100);
 	// Create Window
-	glutCreateWindow("Question 3");
+	glutCreateWindow("WindMill");
 	// Enable Z-buffer depth test
 	glEnable(GL_DEPTH_TEST);
 	// Callback Functions
-	glutDisplayFunc(drawCube);
+	glutDisplayFunc(drawWindMill);
 	glutIdleFunc(rotate);
 	glutSpecialFunc(specialKeys);
 	glutKeyboardFunc(rotateWind);
