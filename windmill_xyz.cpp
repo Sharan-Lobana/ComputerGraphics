@@ -15,26 +15,26 @@ void Cone(double radius, double height, double c1, double c2,bool flag = true)
 	int steps = 1000;
 	for(int i=0;i<steps;++i)
 	{
-		double th = (360.0/steps)*i;
-		glBegin (GL_LINES);
-			if(flag)
-	    glColor3f  (c1,c1,c1);
-			else
-			glColor3f(c1,0,0);
-			glVertex3f  (radius*cos(th),radius*sin(th) , 0);
-			if(flag)
-			glColor3f  (c2, c2, c2);
-			else
-			glColor3f(c2,0,0);
-			glVertex3f(0,0,height);
-	  glEnd ();
+	double th = (360.0/steps)*i;
+	glBegin(GL_LINES);
+		if(flag)
+			glColor3f  (c1,c1,c1);
+		else
+		glColor3f(c1,0,0);
+		glVertex3f(radius*cos(th),radius*sin(th),0);
+		if(flag)
+		glColor3f(c2,c2,c2);
+		else
+		glColor3f(c2,0,0);
+		glVertex3f(0,0,height);
+	glEnd ();
 	}
 }
 
 void ThreeDtriangle(double base_length, double height, double y_span, double c1, double c2)
 {
 	//Bottom Face
-	for(int i = 0; i <= SHARPNESS_FACTOR; i++)
+	for(int i=0;i<=SHARPNESS_FACTOR;i++)
 	{
 		glBegin(GL_LINES);
 			glColor3f(c1,c1,c1);	//Base Color
@@ -44,7 +44,7 @@ void ThreeDtriangle(double base_length, double height, double y_span, double c1,
 		glEnd();
 	}
 	//Top Face
-	for(int i = 0; i <= SHARPNESS_FACTOR; i++)
+	for(int i=0;i<=SHARPNESS_FACTOR;i++)
 	{
 		glBegin(GL_LINES);
 			glColor3f(c1,c1,c1);	//Base Color
@@ -54,7 +54,7 @@ void ThreeDtriangle(double base_length, double height, double y_span, double c1,
 		glEnd();
 	}
 	//Left Face
-	for(int i = 0; i <= SHARPNESS_FACTOR; i++)
+	for(int i=0;i<=SHARPNESS_FACTOR;i++)
 	{
 		glBegin(GL_LINES);
 			glColor3f(c2,c2,c2);
@@ -64,7 +64,7 @@ void ThreeDtriangle(double base_length, double height, double y_span, double c1,
 		glEnd();
 	}
 	//Right Face
-	for(int i = 0; i <= SHARPNESS_FACTOR; i++)
+	for(int i=0;i<=SHARPNESS_FACTOR;i++)
 	{
 		glBegin(GL_LINES);
 			glColor3f(c2,c2,c2);
@@ -74,7 +74,7 @@ void ThreeDtriangle(double base_length, double height, double y_span, double c1,
 		glEnd();
 	}
 	//Front Face
-	for(int i = 0; i <= SHARPNESS_FACTOR; i++)
+	for(int i=0;i<=SHARPNESS_FACTOR;i++)
 	{
 		glBegin(GL_LINES);
 			glColor3f(c1,c1,c1);
@@ -88,9 +88,8 @@ void ThreeDtriangle(double base_length, double height, double y_span, double c1,
 void Wing(double radius, double height, double epoch)
 {
 	glLoadIdentity();
-glTranslatef(0.0,world_y_trans,0.0);
-
- glScalef(scale,scale,scale);
+	glTranslatef(0.0,world_y_trans,0.0);
+ 	glScalef(scale,scale,scale);
 	glRotatef(world_y, 0.0, 1.0, 0.0);
 	glTranslatef(.0,-.05,0);
 	glRotatef(wing_z+epoch, 0.0, 0.0, 1.0);
@@ -105,8 +104,8 @@ glTranslatef(0.0,world_y_trans,0.0);
 void Arrow(double radius,double x, double y, double pos1, double pos2, double c1, double c2)
 {
 	glLoadIdentity();
-glTranslatef(0.0,world_y_trans,0.0);
- glScalef(scale,scale,scale);
+	glTranslatef(0.0,world_y_trans,0.0);
+ 	glScalef(scale,scale,scale);
 	glRotatef(world_y,0,1.0,0);
 	glRotatef(wind_x,1.0,0,0);
 	glRotatef(wind_y,0,1.0,0);
@@ -121,7 +120,7 @@ glTranslatef(0.0,world_y_trans,0.0);
 	if(fabs(progstep) < .00001)
 		return;
 
-	for(int i = 0; i < 100; i++)
+	for(int i=0;i<100;i++)
 	{
 		double th = (360.0/100)*i;
 		glBegin(GL_LINES);
@@ -150,10 +149,10 @@ glTranslatef(0.0,world_y_trans,0.0);
 void TriangularWing(double base_length, double small_height,double large_height, double y_span, double epoch)
 {
 	glLoadIdentity();
-glTranslatef(0.0,world_y_trans,0.0);
- glScalef(scale,scale,scale);
+  	glTranslatef(0.0,world_y_trans,0.0);
+  	glScalef(scale,scale,scale);
 	glRotatef(world_y,0.0,1.0,0.0);
-  glTranslatef(.0,-0.03,-0.065);
+  	glTranslatef(.0,-0.03,-0.065);
 	glRotatef(-wing_z+epoch,0.0,0.0,1.0);
 	glRotatef(60,1.0,0.0,0.0);
 	glTranslatef(-1.4*small_height,0.0,0.0);
@@ -161,8 +160,8 @@ glTranslatef(0.0,world_y_trans,0.0);
 	ThreeDtriangle(base_length, small_height, y_span, 1.0, 0.6);
 
 	glLoadIdentity();
-glTranslatef(0.0,world_y_trans,0.0);
- glScalef(scale,scale,scale);
+  	glTranslatef(0.0,world_y_trans,0.0);
+  	glScalef(scale,scale,scale);
 	glRotatef(world_y,0.0,1.0,0.0);
 	glTranslatef(.0,-0.03,-0.065);
 	glRotatef(-wing_z+epoch,0.0,0.0,1.0);
@@ -193,8 +192,8 @@ void drawWindMill()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear color and depth buffers
 
 	glLoadIdentity();
-glTranslatef(0.0,world_y_trans,0.0);
- glScalef(scale,scale,scale);	// Reset the model-view matrix
+  	glTranslatef(0.0,world_y_trans,0.0);
+  	glScalef(scale,scale,scale);	// Reset the model-view matrix
 
 	// rotate the cube according to rx world_y and wing_z parameters , controlled via arrow keys
 	glRotatef(world_y+90, 0.0, 1.0, 0.0);
@@ -204,22 +203,22 @@ glTranslatef(0.0,world_y_trans,0.0);
 	GLUquadricObj *quadObj = gluNewQuadric();
 
 	glLoadIdentity();
-glTranslatef(0.0,world_y_trans,0.0);
-  glScalef(scale,scale,scale);
+  	glTranslatef(0.0,world_y_trans,0.0);
+  	glScalef(scale,scale,scale);
 	glRotatef(world_y, 0.0, 1.0, 0.0);
 	glTranslatef(0,-0.03,-.07);
 	gluCylinder(quadObj, .03, .03, .05, 100, 100);
 
 	glLoadIdentity();
-glTranslatef(0.0,world_y_trans,0.0);
- glScalef(scale,scale,scale);
+  	glTranslatef(0.0,world_y_trans,0.0);
+  	glScalef(scale,scale,scale);
 	glRotatef(world_y, 0.0, 1.0, 0.0);
 	glTranslatef(0,-0.03,-.07);
 	Cone(.03,.0,.6,.6);
 
 	glLoadIdentity();
-glTranslatef(0.0,world_y_trans,0.0);
- glScalef(scale,scale,scale);
+  	glTranslatef(0.0,world_y_trans,0.0);
+  	glScalef(scale,scale,scale);
 	glRotatef(world_y, 0.0, 1.0, 0.0);
 	glTranslatef(0,-0.03,-0.02);
 	Cone(.03,.0,.6,.6);
@@ -240,70 +239,67 @@ glTranslatef(0.0,world_y_trans,0.0);
 	// TriangularWing(0.055,0.05,0.4,0.025,270);
 
 	glLoadIdentity();
-glTranslatef(0.0,world_y_trans,0.0);
- glScalef(scale,scale,scale);
+  	glTranslatef(0.0,world_y_trans,0.0);
+  	glScalef(scale,scale,scale);
 	glRotatef(-10, 1.0, 0.0, 0.0);
 	glRotatef(world_y+45, 0.0, 1.0, 0.0);
 	for(int i=0;i<1000;++i)
 	{
 		glBegin (GL_LINES);
-	    glColor3f  (0,.1+.3*i/1000.0,0);
-	    glVertex3f  (-.5+i/1000.0,-.75, .5);
-	    glColor3f  (0,.7+.3*i/1000.0,0);
-	    glVertex3f  (-.5+i/1000.0,-.75, -.5);
-	  glEnd();
+		    glColor3f  (0,.1+.3*i/1000.0,0);
+		    glVertex3f  (-.5+i/1000.0,-.75, .5);
+		    glColor3f  (0,.7+.3*i/1000.0,0);
+		    glVertex3f  (-.5+i/1000.0,-.75, -.5);
+		glEnd();
 	}
 
 	glFlush();
-    glutSwapBuffers();
+  	glutSwapBuffers();
 }
 
 void specialKeys(int key, int x, int y)
 {
-	if ( key == GLUT_KEY_RIGHT )
+	if(key == GLUT_KEY_RIGHT)
 		world_y += r_step;
-	if ( key == GLUT_KEY_LEFT )
+
+	if(key == GLUT_KEY_LEFT)
 		world_y -= r_step;
-	if ( key == GLUT_KEY_UP )
-	{
-		//z_step += .05;
-		progstep += progstep_acc;
-	}
-	if ( key == GLUT_KEY_DOWN )
-	{
-		//z_step -= .05;
+
+	if(key == GLUT_KEY_UP)
+			progstep += progstep_acc;
+
+	if(key == GLUT_KEY_DOWN)
 		progstep -= progstep_acc;
-	}
-	if ( key == GLUT_KEY_PAGE_DOWN )
+
+	if(key == GLUT_KEY_PAGE_DOWN)
 	{
 		if(world_y_trans < scale - 1)
 			world_y_trans += 0.05;
 	}
-	if ( key == GLUT_KEY_PAGE_UP )
+	if(key == GLUT_KEY_PAGE_UP)
 	{
 		if(world_y_trans > -scale + 1)
-		world_y_trans -= 0.05;
+			world_y_trans -= 0.05;
 	}
-
 	glutPostRedisplay();
 }
+
 void rotate()
 {
 	double acc = progstep * cos(wind_x/180*PI)*cos(wind_y/180*PI) * wind_acc_factor - wing_speed * turbine_factor;
 
 	wing_speed += acc;
-
-	// wing_z += progstep*z_factor*cos(wind_x/180*PI)*cos(wind_y/180*PI);
-
 	wing_z += wing_speed;
-
 	progoffset += progstep;
+
 	if(-0.78 + progoffset > 0.99)
 		progoffset = 0.0;
 	else if(-.98 + progoffset < -0.99)
 		progoffset = 1.76;
+
 	glutPostRedisplay();
 }
+
 void rotateWind(unsigned char key, int x, int y)
 {
 	if(key == 'w')
@@ -315,23 +311,23 @@ void rotateWind(unsigned char key, int x, int y)
 	else if(key == 'd')
 		wind_y -= r_step;
 }
+
 void mouseWheel(int button, int dir, int x, int y)
 {
     if (button == 3)
     {
-			if(scale <= 3.0)
-			scale += 0.03;
-        // Zoom in
+	// Zoom in
+	if(scale <= 3.0)
+		scale += 0.03;
     }
     else if(button == 4)
     {
-			if(scale >= 0.5)
-			scale -= 0.03;
-        // Zoom out
+	// Zoom out
+	if(scale >= 0.5)
+		scale -= 0.03;
     }
-
-    return;
 }
+
 int main(int argc, char* argv[])
 {
 	// Initialize GLUT and process user parameters
@@ -346,6 +342,7 @@ int main(int argc, char* argv[])
 	glutCreateWindow("WindMill");
 	// Enable Z-buffer depth test
 	glEnable(GL_DEPTH_TEST);
+	
 	// Callback Functions
 	glutDisplayFunc(drawWindMill);
 	glutIdleFunc(rotate);
