@@ -9,7 +9,7 @@ void reverse(char *str, int len)
         i++; j--;
     }
 }
- 
+
  // Converts a given integer x to string str[].  d is the number
  // of digits required in output. If d is more than the number
  // of digits in x, then 0s are added at the beginning.
@@ -107,14 +107,10 @@ void rotate()
 
 void rotateWind(unsigned char key, int x, int y)
 {
-	if(key == 'w')
-		wind_x += r_step;
-	else if(key == 's')
-		wind_x -= r_step;
-	else if(key == 'a')
-		wind_y += r_step;
-	else if(key == 'd')
+	if(key == 'a')
 		wind_y -= r_step;
+	else if(key == 'd')
+		wind_y += r_step;
 }
 
 void mouseWheel(int button, int dir, int x, int y)
