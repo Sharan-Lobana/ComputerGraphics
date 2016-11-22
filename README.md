@@ -9,7 +9,7 @@ To install the dependencies related to OpenGL refer to the
 ### Linux
 1. Open **Terminal** or any terminal emulator(**Terminator** etc)
 2. *Change* the directory to location of **windmill_xyz.cpp**
-3. *Run* <code> g++ windmill.cpp -lglut -lGL -lGLU -o windmill_xyz </code> 
+3. *Run* <code> g++ windmill_xyz.cpp -lglut -lGL -lGLU -o windmill_xyz </code> 
 4. *Run* <code> ./windmill_xyz </code>
 
 A new window will open up.</br>
