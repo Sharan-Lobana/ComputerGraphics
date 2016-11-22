@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdarg.h>
 #include <math.h>
 #include <GL/glut.h>
@@ -6,185 +7,25 @@
 #define GL_GLEXT_PROTOTYPES
 #define PI 3.1416
 #define SHARPNESS_FACTOR 500
+
 double world_y = 0, wing_z = 0, z_factor = 100.0, r_step = 5.0, scale = 1.0, world_y_trans = 0.0 , wing_speed = 0.0;
 double wind_y = 0, wind_x = 0, wind_acc_factor = .8, turbine_factor = 0.005;
 double progoffset = 0.0, progstep = 0.000, progstep_acc = .0005;
+double torqueFact = 0.00002;
+#include "shapes.h"
+#include "user.h"
 
-void Cone(double radius, double height, double c1, double c2,bool flag = true)
+
+int w=1000,h=1000;
+
+void print_bitmap_string(void* font, char* s)
 {
-	int steps = 1000;
-	for(int i=0;i<steps;++i)
-	{
-	double th = (360.0/steps)*i;
-	glBegin(GL_LINES);
-		if(flag)
-			glColor3f  (c1,c1,c1);
-		else
-		glColor3f(c1,0,0);
-		glVertex3f(radius*cos(th),radius*sin(th),0);
-		if(flag)
-		glColor3f(c2,c2,c2);
-		else
-		glColor3f(c2,0,0);
-		glVertex3f(0,0,height);
-	glEnd ();
-	}
-}
-
-void ThreeDtriangle(double base_length, double height, double y_span, double c1, double c2)
-{
-	//Bottom Face
-	for(int i=0;i<=SHARPNESS_FACTOR;i++)
-	{
-		glBegin(GL_LINES);
-			glColor3f(c1,c1,c1);	//Base Color
-			glVertex3f(((double)i*base_length)/SHARPNESS_FACTOR-base_length/2,0.0,0.0);
-			glColor3f(c2,c2,c2);
-			glVertex3f(0.0,0.0,height);
-		glEnd();
-	}
-	//Top Face
-	for(int i=0;i<=SHARPNESS_FACTOR;i++)
-	{
-		glBegin(GL_LINES);
-			glColor3f(c1,c1,c1);	//Base Color
-			glVertex3f(((double)i*base_length)/SHARPNESS_FACTOR-base_length/2,y_span,0.0);
-			glColor3f(c2,c2,c2);
-			glVertex3f(0.0,y_span,height);
-		glEnd();
-	}
-	//Left Face
-	for(int i=0;i<=SHARPNESS_FACTOR;i++)
-	{
-		glBegin(GL_LINES);
-			glColor3f(c2,c2,c2);
-			glVertex3f(-1*base_length/2,(double)i*y_span/SHARPNESS_FACTOR,0.0);
-			glColor3f(c2,c2,c2);
-			glVertex3f(0.0,(double)i*y_span/SHARPNESS_FACTOR,height);
-		glEnd();
-	}
-	//Right Face
-	for(int i=0;i<=SHARPNESS_FACTOR;i++)
-	{
-		glBegin(GL_LINES);
-			glColor3f(c2,c2,c2);
-			glVertex3f(base_length/2,(double)i*y_span/SHARPNESS_FACTOR,0.0);
-			glColor3f(c2,c2,c2);
-			glVertex3f(0.0,(double)i*y_span/SHARPNESS_FACTOR,height);
-		glEnd();
-	}
-	//Front Face
-	for(int i=0;i<=SHARPNESS_FACTOR;i++)
-	{
-		glBegin(GL_LINES);
-			glColor3f(c1,c1,c1);
-			glVertex3f(-1.0*base_length/2,i*y_span/SHARPNESS_FACTOR,0.0);
-			glColor3f(c1,c1,c1);
-			glVertex3f(1.0*base_length/2,i*y_span/SHARPNESS_FACTOR,0.0);
-		glEnd();
-	}
-}
-
-void Wing(double radius, double height, double epoch)
-{
-	glLoadIdentity();
-	glTranslatef(0.0,world_y_trans,0.0);
- 	glScalef(scale,scale,scale);
-	glRotatef(world_y, 0.0, 1.0, 0.0);
-	glTranslatef(.0,-.05,0);
-	glRotatef(wing_z+epoch, 0.0, 0.0, 1.0);
-	glTranslatef(.05,.0,-.07);
-	glRotatef(90, 0.0, 1.0, 0.0);
-	Cone(radius,height,.1,1);
-}
-
-//Arrow is from pos1 to pos2 with propagation offset of progoffset
-//pos2 > pos1
-//Initialize pos1 to -1.0 and pos2 to pos1 + length of the arrow
-void Arrow(double radius,double x, double y, double pos1, double pos2, double c1, double c2)
-{
-	glLoadIdentity();
-	glTranslatef(0.0,world_y_trans,0.0);
- 	glScalef(scale,scale,scale);
-	glRotatef(world_y,0,1.0,0);
-	glRotatef(wind_x,1.0,0,0);
-	glRotatef(wind_y,0,1.0,0);
-
-	if(progstep < 0)
-	{
-		double temp = c1;
-		c1 = c2;
-		c2 = temp;
-	}
-
-	if(fabs(progstep) < .00001)
-		return;
-
-	for(int i=0;i<100;i++)
-	{
-		double th = (360.0/100)*i;
-		glBegin(GL_LINES);
-			glColor3f(c1,0,0);
-			glVertex3f(x+radius*cos(th),y+radius*sin(th),pos1+progoffset);
-			glColor3f(c2,0,0);
-			glVertex3f(x+radius*cos(th),y+radius*sin(th),pos2+progoffset);
-		glEnd();
-	}
-
-
-
-	if(progstep > 0)
-	{
-		glTranslatef(x,y,pos2+progoffset);
-		Cone(3*radius,fabs(pos2-pos1)*0.4,1.0,1.0,false);
-	}
-	else if(progstep < 0)
-	{
-		glTranslatef(x,y,pos1+progoffset);
-		glRotatef(180,0,1.0,0);
-		Cone(3*radius,fabs(pos2-pos1)*0.4,1.0,1.0,false);
-	}
-}
-
-void TriangularWing(double base_length, double small_height,double large_height, double y_span, double epoch)
-{
-	glLoadIdentity();
-  	glTranslatef(0.0,world_y_trans,0.0);
-  	glScalef(scale,scale,scale);
-	glRotatef(world_y,0.0,1.0,0.0);
-  	glTranslatef(.0,-0.03,-0.065);
-	glRotatef(-wing_z+epoch,0.0,0.0,1.0);
-	glRotatef(60,1.0,0.0,0.0);
-	glTranslatef(-1.4*small_height,0.0,0.0);
-	glRotatef(90,0.0,1.0,0.0);
-	ThreeDtriangle(base_length, small_height, y_span, 1.0, 0.6);
-
-	glLoadIdentity();
-  	glTranslatef(0.0,world_y_trans,0.0);
-  	glScalef(scale,scale,scale);
-	glRotatef(world_y,0.0,1.0,0.0);
-	glTranslatef(.0,-0.03,-0.065);
-	glRotatef(-wing_z+epoch,0.0,0.0,1.0);
-	glRotatef(60,1.0,0.0,0.0);
-	glTranslatef(-1.4*small_height,0.0,0.0);
-	glRotatef(270,0.0,1.0,0.0);
-	ThreeDtriangle(base_length, large_height, y_span, 1.0, 0.6);
-}
-
-void Shaft(double r_bottom, double r_top, double height)
-{
-	int steps = 1000;
-	for(int i=0;i<steps;++i)
-	{
-		double th = (2*PI/steps)*i;
-			glBegin (GL_LINES);
-			double c = .7 + cos(th)*.2;
-			glColor3f  (c , c, c);
-			glVertex3f  (r_top*cos(th),r_top*sin(th) , 0);
-			glVertex3f  (r_bottom*cos(th),r_bottom*sin(th) , height);
-			glEnd ();
-	}
-
+   if (s && strlen(s)) {
+      while (*s) {
+         glutBitmapCharacter(font, *s);
+         s++;
+      }
+   }
 }
 
 void drawWindMill()
@@ -215,14 +56,56 @@ void drawWindMill()
 	glRotatef(world_y, 0.0, 1.0, 0.0);
 	glTranslatef(0,-0.03,-.07);
 	Cone(.03,.0,.6,.6);
-
+//////////////////////
+	GLdouble size;
+	GLdouble aspect;
 	glLoadIdentity();
-  	glTranslatef(0.0,world_y_trans,0.0);
-  	glScalef(scale,scale,scale);
-	glRotatef(world_y, 0.0, 1.0, 0.0);
-	glTranslatef(0,-0.03,-0.02);
-	Cone(.03,.0,.6,.6);
+	size = (GLdouble)((w >= h) ? w : h) / 2.0;
+	if (w <= h) {
+	  aspect = (GLdouble)h/(GLdouble)w;
+	  glOrtho(-size, size, -size*aspect, size*aspect, -100000.0, 100000.0);
+	}
+	else {
+	  aspect = (GLdouble)w/(GLdouble)h;
+	  glOrtho(-size*aspect, size*aspect, -size, size, -100000.0, 100000.0);
+	}
 
+	glColor4f(0.20, 0.20, 0.20, 0.0);
+	glRasterPos2f(200, 80.0);
+	print_bitmap_string(GLUT_BITMAP_HELVETICA_18, "PPAP FARM :)");
+	
+	//Wing speed
+	glColor4f(0.0, 1.0, 1.0, 0.0);
+	glRasterPos2f(200, 40.0);
+	char* st = new char[100];
+	ftoa(fabs(wing_speed),st,4);
+	print_bitmap_string(GLUT_BITMAP_HELVETICA_12, "Wing Speed(deg/frame): ");
+	if(wing_speed<0.0)	print_bitmap_string(GLUT_BITMAP_HELVETICA_12, "-");
+	print_bitmap_string(GLUT_BITMAP_HELVETICA_12, st);
+
+	//Wind speed
+	glColor4f(1.0, 0.0, 0.0, 0.0);
+	glRasterPos2f(200, 20.0);
+	ftoa(1000*fabs(progstep),st,4);
+	print_bitmap_string(GLUT_BITMAP_HELVETICA_12, "Wind Speed(km/hr): ");
+	if(progstep<0.0)	print_bitmap_string(GLUT_BITMAP_HELVETICA_12, "-");
+	print_bitmap_string(GLUT_BITMAP_HELVETICA_12, st);
+
+	glColor4f(1.0, 0.0, 1.0, 0.0);
+	glRasterPos2f(200, 0.0);
+	ftoa(1000*fabs(progstep*cos(wind_y/180*PI)*cos(wind_x/180*PI)),st,4);
+	print_bitmap_string(GLUT_BITMAP_HELVETICA_12, "Wind Speed z(km/hr): ");
+	if(progstep*cos(wind_y/180*PI)*cos(wind_x/180*PI)<0.0)	print_bitmap_string(GLUT_BITMAP_HELVETICA_12, "-");
+	print_bitmap_string(GLUT_BITMAP_HELVETICA_12, st);
+
+	glColor4f(1.0, 0.0, 1.0, 0.0);
+	glRasterPos2f(200, -20.0);
+	ftoa(1000*fabs(torqueFact*wing_speed*wing_speed),st,4);
+	print_bitmap_string(GLUT_BITMAP_HELVETICA_12, "Power: ");
+	print_bitmap_string(GLUT_BITMAP_HELVETICA_12, st);
+	print_bitmap_string(GLUT_BITMAP_HELVETICA_12, " MW");
+
+//////////////////////////
 	// Wing(.04,.5,0);
 	// Wing(.04,.5,90);
 	// Wing(.04,.5,180);
@@ -237,6 +120,8 @@ void drawWindMill()
 	TriangularWing(0.055,0.05,0.4,0.025,150);
 	TriangularWing(0.055,0.05,0.4,0.025,270);
 	// TriangularWing(0.055,0.05,0.4,0.025,270);
+
+	
 
 	glLoadIdentity();
   	glTranslatef(0.0,world_y_trans,0.0);
@@ -255,77 +140,6 @@ void drawWindMill()
 
 	glFlush();
   	glutSwapBuffers();
-}
-
-void specialKeys(int key, int x, int y)
-{
-	if(key == GLUT_KEY_RIGHT)
-		world_y += r_step;
-
-	if(key == GLUT_KEY_LEFT)
-		world_y -= r_step;
-
-	if(key == GLUT_KEY_UP)
-			progstep += progstep_acc;
-
-	if(key == GLUT_KEY_DOWN)
-		progstep -= progstep_acc;
-
-	if(key == GLUT_KEY_PAGE_DOWN)
-	{
-		if(world_y_trans < scale - 1)
-			world_y_trans += 0.05;
-	}
-	if(key == GLUT_KEY_PAGE_UP)
-	{
-		if(world_y_trans > -scale + 1)
-			world_y_trans -= 0.05;
-	}
-	glutPostRedisplay();
-}
-
-void rotate()
-{
-	double acc = progstep * cos(wind_x/180*PI)*cos(wind_y/180*PI) * wind_acc_factor - wing_speed * turbine_factor;
-
-	wing_speed += acc;
-	wing_z += wing_speed;
-	progoffset += progstep;
-
-	if(-0.78 + progoffset > 0.99)
-		progoffset = 0.0;
-	else if(-.98 + progoffset < -0.99)
-		progoffset = 1.76;
-
-	glutPostRedisplay();
-}
-
-void rotateWind(unsigned char key, int x, int y)
-{
-	if(key == 'w')
-		wind_x += r_step;
-	else if(key == 's')
-		wind_x -= r_step;
-	else if(key == 'a')
-		wind_y += r_step;
-	else if(key == 'd')
-		wind_y -= r_step;
-}
-
-void mouseWheel(int button, int dir, int x, int y)
-{
-    if (button == 3)
-    {
-	// Zoom in
-	if(scale <= 3.0)
-		scale += 0.03;
-    }
-    else if(button == 4)
-    {
-	// Zoom out
-	if(scale >= 0.5)
-		scale -= 0.03;
-    }
 }
 
 int main(int argc, char* argv[])
