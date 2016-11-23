@@ -68,12 +68,12 @@ void drawWindMill()
 	glRasterPos2f(200, 240.0);
 	strcpy(st,"Wing Speed(deg/frame): ");
 	print_bitmap_string(GLUT_BITMAP_HELVETICA_18,st);
-	ftoa(fabs(wing_speed),st,4);
 	if(wing_speed<0.0)
 	{
 		strcpy(st,"-");
 		print_bitmap_string(GLUT_BITMAP_HELVETICA_12,st);
 	}
+	ftoa(fabs(wing_speed),st,4);
 	print_bitmap_string(GLUT_BITMAP_HELVETICA_18, st);
 
 	//Wind speed
