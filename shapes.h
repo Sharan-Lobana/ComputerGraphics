@@ -1,3 +1,10 @@
+
+//Utility function for constructing Cone(used as arrow heads)
+//Radius is the radius of the base
+//height is the height of cone
+//c1,c2 are used for coloring
+//flag is use for color gradient definition
+//(disc of wings axle is constructed using cone with height 0 and flag set to true)
 void Cone(double radius, double height, double c1, double c2,bool flag = true)
 {
 	int steps = 1000;
@@ -18,6 +25,12 @@ void Cone(double radius, double height, double c1, double c2,bool flag = true)
 	glEnd ();
 	}
 }
+
+//Utility function for constructing ThreeDtriangle
+//base_length is the length of the base
+//height is the height of triangle
+//y_span is the thickness of triangle
+//c1,c2 are used for coloring
 void ThreeDtriangle(double base_length, double height, double y_span, double c1, double c2)
 {
 	//Bottom Face
@@ -72,18 +85,19 @@ void ThreeDtriangle(double base_length, double height, double y_span, double c1,
 	}
 }
 
-//Arrow is from pos1 to pos2 with propagation offset of progoffset
-//pos2 > pos1
-//Initialize pos1 to -1.0 and pos2 to pos1 + length of the arrow
+//Utility Function for constructing Wind Arrows
+//Radius is radius of cylindrical tail
+//x,y are the coordinates of translation
+//pos1,pos2 define the end points of the tail along its axis
+//c1,c2 are used for coloring the arrow
 void Arrow(double radius,double x, double y, double pos1, double pos2, double c1, double c2)
 {
 	glLoadIdentity();
 	glTranslatef(0.0,world_y_trans,0.0);
- 	glScalef(scale,scale,scale);
- 	glTranslatef(x,y,0);
- 	glRotatef(floor_x/2,1,0,0);
+	glScalef(scale,scale,scale);
+	glTranslatef(x,y,0);
+	glRotatef(floor_x/2,1,0,0);
 	glRotatef(world_y,0,1.0,0);
-	glRotatef(wind_x,1.0,0,0);
 	glRotatef(wind_y,0,1.0,0);
 
 	if(progstep < 0)
@@ -107,8 +121,6 @@ void Arrow(double radius,double x, double y, double pos1, double pos2, double c1
 		glEnd();
 	}
 
-
-
 	if(progstep > 0)
 	{
 		glTranslatef(0,0,pos2+progoffset);
@@ -122,6 +134,11 @@ void Arrow(double radius,double x, double y, double pos1, double pos2, double c1
 	}
 }
 
+//Utility Function for constructing dashboard_arrow
+//Radius is radius of cylindrical tail
+//x,y are the coordinates of translation
+//len is the length of the tail
+//c1,c2 are used for coloring the arrow
 void dashboard_arrow(double radius,double x, double y, double len, double c1, double c2)
 {
 	glLoadIdentity();
@@ -129,7 +146,7 @@ void dashboard_arrow(double radius,double x, double y, double len, double c1, do
 	glRotatef(floor_x/2,1.0,0.0,0);
 	glRotatef(world_y,0,1.0,0);
 	glRotatef(wind_y,0,1.0,0);
-	
+
 	if(fabs(progstep) < .00001)
 		return;
 
@@ -144,8 +161,6 @@ void dashboard_arrow(double radius,double x, double y, double len, double c1, do
 		glEnd();
 	}
 
-
-
 	if(progstep > 0)
 	{
 		glTranslatef(0,0,len);
@@ -159,13 +174,19 @@ void dashboard_arrow(double radius,double x, double y, double len, double c1, do
 	}
 }
 
+//Utility Function for constructing TriangularWing
+//base_length is the length of base of 3d triangle
+//small_length is the height of smaller 3d triangle
+//large_height is the height of larger 3d triangle
+//y_span is the thickness of wing
+//epoch is the intial angular offset of rotation about z-axis
 void TriangularWing(double base_length, double small_height,double large_height, double y_span, double epoch)
 {
 	glLoadIdentity();
-  	glTranslatef(0.0,world_y_trans,0.0);
-  	glScalef(scale,scale,scale);
+	glTranslatef(0.0,world_y_trans,0.0);
+	glScalef(scale,scale,scale);
 	glRotatef(world_y,0.0,1.0,0.0);
-  	glTranslatef(.0,-0.03,-0.065);
+	glTranslatef(.0,-0.03,-0.065);
 	glRotatef(-wing_z+epoch,0.0,0.0,1.0);
 	glRotatef(60,1.0,0.0,0.0);
 	glTranslatef(-1.4*small_height,0.0,0.0);
@@ -173,8 +194,8 @@ void TriangularWing(double base_length, double small_height,double large_height,
 	ThreeDtriangle(base_length, small_height, y_span, 1.0, 0.6);
 
 	glLoadIdentity();
-  	glTranslatef(0.0,world_y_trans,0.0);
-  	glScalef(scale,scale,scale);
+	glTranslatef(0.0,world_y_trans,0.0);
+	glScalef(scale,scale,scale);
 	glRotatef(world_y,0.0,1.0,0.0);
 	glTranslatef(.0,-0.03,-0.065);
 	glRotatef(-wing_z+epoch,0.0,0.0,1.0);
@@ -183,6 +204,11 @@ void TriangularWing(double base_length, double small_height,double large_height,
 	glRotatef(270,0.0,1.0,0.0);
 	ThreeDtriangle(base_length, large_height, y_span, 1.0, 0.6);
 }
+
+//Utility Function for Constructing Shaft
+//r_bottom is bottom radius
+//r_top is top radius
+//height is the height of staff
 void Shaft(double r_bottom, double r_top, double height)
 {
 	int steps = 1000;
@@ -196,5 +222,17 @@ void Shaft(double r_bottom, double r_top, double height)
 			glVertex3f  (r_bottom*cos(th),r_bottom*sin(th) , height);
 		glEnd ();
 	}
+}
 
+//Utility Function to print characters on screen
+void print_bitmap_string(void* font, char* s)
+{
+	if(s&&strlen(s))
+	{
+		while(*s)
+		{
+			glutBitmapCharacter(font, *s);
+			s++;
+		}
+	}
 }
