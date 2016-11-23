@@ -17,4 +17,6 @@ USE **UP_ARROW_KEY** to increase the speed of the wind.</br>
 USE **DOWN_ARROW_KEY** to decrease the speed or reverse the direction of wind.</br>
 USE **A** and **D** keys to change the direction of wind.</br>
 USE **LEFT_ARROW_KEY** and **RIGHT_ARROW_KEY** to rotate the view about vertical axis.</br>
+USE **SCROLL** to zoom-in and zoom-out.</br>
+USE **PAGE_UP_KEY** and **PAGE_DOWN_KEY** to translate view along vertical axis.</br>
 
